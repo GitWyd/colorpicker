@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>PyBullet Color Picker</title>
+  <style>
+    /* Opt into both light and dark color-scheme for form controls */
+    :root {
+      color-scheme: light dark;
+    }     
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      margin: 0;
+      background: #EEE;
+      color: #111;
+    }  
+
+    .container {
+      width: 100%;
+      max-width: 360px;
+      padding: 1.5em;
+      background: #FFF;
+      border-radius: 20px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+
+    h1 {
+      margin: 0 0 0.5em;
+      font-size: 1.75rem;
+    }                     
+
+    .byline {
+      margin: 0 0 1em;
+      font-size: 0.9rem;
+      color: #666;
+    }
+
+    h2 {
+      margin: 0 0 0.5em;
+      font-size: 1.125rem;
+    }                     
+
+    label {
+      display: block;
+      text-align: left;
+      margin-bottom: 0.25em;
+      font-weight: bold;
+      font-size: 0.9rem;
+    }
+
+    input[type="color"] {
+      width: 100%;
+      height: 50px;
+      border: none;
+      margin-bottom: 1em;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+
+    input[type="range"] {
+      width: 100%;
+      margin: 0.5em 0;
+    }
+
+    .output {
+      margin-top: 1em;
+      font-family: monospace;
+      font-size: 1rem;
+    }
+    button {
+      margin-top: 1em;
+      padding: 0.5em 1em;
+      font-size: 0.9rem;
+      border: none;
+      border-radius: 8px;
+      background-color: #007bff;
+      color: white;
+      cursor: pointer;
+    }
+    button:active {
+      transform: scale(0.98);
+    }
+    /* Dark mode overrides */
+    @media (prefers-color-scheme: dark) {             
+      body {
+        background: #222;
+        color: #EEE;
+      }
+      .container {
+        background: #333;
+        box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+      }
+
+      .byline {
+        color: #AAA;
+      }
+
+      button {
+        background-color: #1e90ff;
+      }
+    }  
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>PyBullet Color Picker</h1>
+    <p class="byline">by GitWyd</p> 
+
+    <label for="colorPicker">Color</label>
+    <input type="color" id="colorPicker" value="#ff00ff">
+
+    <label for="alphaRange">Opacity (Alpha): <span id="alphaValue">1.00</span></label>
+    <input type="range" id="alphaRange" min="0" max="1" step="0.01" value="1">
+
+    <div class="output">
+      <h2> PyBullet RGBA </h2>
+      <span id="output">[0.700, 0.000, 1.000, 1.00]</span>
+    </div>
+    <button id="copyBtn">Copy RGBA</button>
+
+  </div>
+
+  <script>
+    const colorInput = document.getElementById('colorPicker');
+    const alphaInput = document.getElementById('alphaRange');
+    const alphaDisplay = document.getElementById('alphaValue');
+    const outputEl   = document.getElementById('output');
+    const copyBtn    = document.getElementById('copyBtn');
+
+    function updateColor() {
+      const hex = colorInput.value;
+      const r   = parseInt(hex.substr(1,2),16) / 255;
+      const g   = parseInt(hex.substr(3,2),16) / 255;
+      const b   = parseInt(hex.substr(5,2),16) / 255;
+      const a   = parseFloat(alphaInput.value);
+
+      alphaDisplay.textContent = a.toFixed(2);
+      outputEl.textContent    = `[${r.toFixed(3)}, ${g.toFixed(3)}, ${b.toFixed(3)}, ${a.toFixed(2)}]`;
+      console.log('PyBullet RGBA:', [r, g, b, a]);
+    }
+    async function copyToClipboard() {
+      try {
+        await navigator.clipboard.writeText(outputEl.textContent);
+        copyBtn.textContent = 'Copied!';
+        setTimeout(() => copyBtn.textContent = 'Copy RGBA', 1500);
+      } catch (err) {
+        console.error('Copy failed:', err);
+      }
+    }
+
+    colorInput.addEventListener('input', updateColor);
+    alphaInput.addEventListener('input', updateColor);
+    copyBtn.addEventListener('click', copyToClipboard);
+    updateColor();
+  </script>
+</body>
+</html>
